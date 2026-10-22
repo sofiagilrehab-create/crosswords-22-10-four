@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
+  <title>Clevertouch Crossword Experience - Simplex #19,196</title>
+  <style>
+    /* ==========================================================================
+       CLEVERTOUCH & LARGE SCREEN DISPLAY HARDWARE STYLING & TOUCH RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      overflow: hidden;
+      background-color: #060913;
+      background: radial-gradient(circle at center, #101935 0%, #060913 100%);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    /* Main App Layout Grid */
+    #app-container {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    /* Top Kiosk Banner */
+    header {
+      background-color: #121a2f;
+      border: 3px solid #00f0ff;
+      border-radius: 20px;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+      min-height: 80px;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-icon {
+      width: 54px;
+      height: 54px;
+      background: linear-gradient(135deg, #00f0ff, #7000ff);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .sub-title {
+      font-size: 1.05rem;
+      color: #00f0ff;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* Navigation Mode Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      background-color: #0a0f1d;
+      padding: 6px;
+      border-radius: 16px;
+      border: 2px solid #202b46;
+    }
+
+    .tab-btn {
+      background-color: #1a243d;
+      color: #a0aec0;
+      border: 2px solid #2d3b5e;
+      padding: 14px 28px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+      min-height: 60px;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #00f0ff 0%, #0072ff 100%);
+      color: #000000;
+      border-color: #00f0ff;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+    }
+
+    /* Main Body Panels */
+    main {
+      flex: 1;
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 120px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .view-panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* ==========================================================================
+       MODE 1: INTERACTIVE QUIZ GAME STYLING
+       ========================================================================== */
+    #quiz-view {
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .quiz-header-bar {
+      width: 100%;
+      background-color: #121a2f;
+      border: 2px solid #202b46;
+      border-radius: 18px;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      background-color: #7000ff;
+      color: #ffffff;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      border: 2px solid #a855f7;
+      box-shadow: 0 0 12px rgba(112, 0, 255, 0.4);
+    }
+
+    .score-display {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffea00;
+      text-shadow: 0 0 10px rgba(255, 234, 0, 0.5);
+    }
+
+    /* Giant Clue Card Display */
+    .quiz-card {
+      width: 100%;
+      flex: 1;
+      background-color: #121a2f;
+      border: 3px solid #00f0ff;
+      border-radius: 24px;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.2);
+      position: relative;
+    }
+
+    .clue-text {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 20px;
+      max-width: 90%;
+    }
+
+    .length-tag {
+      background-color: #1a243d;
+      color: #00f0ff;
+      border: 2px solid #00f0ff;
+      padding: 6px 20px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    /* Giant Letter Slots */
+    .letter-slots-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      max-width: 95%;
+    }
+
+    .letter-slot {
+      width: 68px;
+      height: 78px;
+      background-color: #0a0f1d;
+      border: 3px solid #202b46;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #00ff88;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+      transition: all 0.1s ease;
+    }
+
+    .letter-slot.filled {
+      border-color: #00ff88;
+      background-color: #0d261e;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+      transform: scale(1.05);
+    }
+
+    .letter-slot.space {
+      width: 30px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Quiz Action Buttons Bar */
+    .action-btn-group {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .action-btn {
+      background-color: #1a243d;
+      color: #ffffff;
+      border: 2px solid #2d3b5e;
+      padding: 14px 24px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 60px;
+    }
+
+    .action-btn.hint {
+      background-color: #2b2200;
+      color: #ffea00;
+      border-color: #ffea00;
+    }
+
+    .action-btn.reveal {
+      background-color: #33001b;
+      color: #ff007f;
+      border-color: #ff007f;
+    }
+
+    .action-btn.nav {
+      background-color: #121a2f;
+      color: #00f0ff;
+      border-color: #00f0ff;
+    }
+
+    /* ==========================================================================
+       CLEVERTOUCH OVERSIZED VIRTUAL KEYBOARD
+       ========================================================================== */
+    .keyboard-container {
+      width: 100%;
+      background-color: #0a0f1d;
+      border: 3px solid #202b46;
+      border-radius: 20px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .kb-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .key-btn {
+      flex: 1;
+      max-width: 85px;
+      height: 65px;
+      background-color: #1c2744;
+      color: #ffffff;
+      border: 2px solid #344673;
+      border-radius: 12px;
+      font-size: 1.8rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #0d1424;
+      transition: all 0.08s ease;
+    }
+
+    .key-btn:active, .key-btn.pressed {
+      transform: translateY(4px);
+      box-shadow: none;
+      background-color: #00f0ff;
+      color: #000000;
+    }
+
+    .key-btn.wide {
+      flex: 1.8;
+      max-width: 140px;
+      background-color: #3d1429;
+      color: #ff007f;
+      border-color: #ff007f;
+      font-size: 1.3rem;
+    }
+
+    /* ==========================================================================
+       MODE 2: GIANT CLUE CARDS GRID STYLING
+       ========================================================================== */
+    #cards-view {
+      gap: 16px;
+    }
+
+    .filter-bar {
+      background-color: #121a2f;
+      border: 2px solid #202b46;
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .filter-btn {
+      background-color: #1a243d;
+      color: #a0aec0;
+      border: 2px solid #2d3b5e;
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 54px;
+    }
+
+    .filter-btn.active {
+      background-color: #7000ff;
+      color: #ffffff;
+      border-color: #a855f7;
+      box-shadow: 0 0 15px rgba(112, 0, 255, 0.5);
+    }
+
+    .search-box {
+      background-color: #0a0f1d;
+      border: 2px solid #202b46;
+      color: #ffffff;
+      padding: 12px 20px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border-radius: 12px;
+      width: 320px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: #00f0ff;
+    }
+
+    .cards-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .clue-card {
+      background-color: #121a2f;
+      border: 3px solid #202b46;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .clue-card.across {
+      border-left: 8px solid #00f0ff;
+    }
+
+    .clue-card.down {
+      border-left: 8px solid #ff007f;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-num {
+      background-color: #00f0ff;
+      color: #000000;
+      font-weight: 900;
+      font-size: 1.2rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    .clue-card.down .card-num {
+      background-color: #ff007f;
+      color: #ffffff;
+    }
+
+    .card-dir {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #a0aec0;
+      text-transform: uppercase;
+    }
+
+    .card-clue-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      margin-bottom: 16px;
+    }
+
+    .card-ans-box {
+      background-color: #0a0f1d;
+      border: 2px dashed #202b46;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #00ff88;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-ans-box.hidden {
+      color: #4a5568;
+      letter-spacing: 1px;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    /* Scrollbar Styling for Clevertouch Displays */
+    ::-webkit-scrollbar {
+      width: 14px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0f1d;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #202b46;
+      border-radius: 8px;
+      border: 3px solid #0a0f1d;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    <!-- HEADER -->
+    <header>
+      <div class="title-group">
+        <div class="app-icon">IT</div>
+        <div>
+          <h1>Irish Times Simplex Crossword</h1>
+          <div class="sub-title">No. 19,196 • Clevertouch Large Touchscreen Edition</div>
+        </div>
+      </div>
+
+      <div class="nav-tabs">
+        <button id="tab-quiz" class="tab-btn active">
+          <span>🎮</span> Interactive Quiz
+        </button>
+        <button id="tab-cards" class="tab-btn">
+          <span>🎴</span> Clue Cards Grid
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main>
+      <!-- ================= MODE 1: INTERACTIVE QUIZ ================= -->
+      <div id="quiz-view" class="view-panel active">
+        <div class="quiz-header-bar">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="quiz-badge" class="badge">ACROSS #1</span>
+            <span id="quiz-progress" style="font-size: 1.3rem; font-weight: 700; color: #a0aec0;">Clue 1 of 36</span>
+          </div>
+
+          <div class="score-display" id="quiz-score">0 PTS</div>
+        </div>
+
+        <div class="quiz-card">
+          <div id="quiz-clue" class="clue-text">"It's used in jam-making (6)"</div>
+          <div id="quiz-length" class="length-tag">6 Letters</div>
+
+          <!-- Letter Slots Container -->
+          <div id="quiz-slots" class="letter-slots-container"></div>
+
+          <!-- Control Action Buttons -->
+          <div class="action-btn-group">
+            <button class="action-btn nav" id="btn-prev">◀ Previous</button>
+            <button class="action-btn hint" id="btn-hint">💡 Hint (1 Letter)</button>
+            <button class="action-btn reveal" id="btn-reveal">👁️ Reveal Answer</button>
+            <button class="action-btn nav" id="btn-clear">🗑️ Clear</button>
+            <button class="action-btn nav" id="btn-next">Next ▶</button>
+            <button class="action-btn nav" id="btn-random">🎲 Random</button>
+          </div>
+        </div>
+
+        <!-- Clevertouch Virtual Keyboard -->
+        <div class="keyboard-container" id="quiz-keyboard"></div>
+      </div>
+
+      <!-- ================= MODE 2: GIANT CLUE CARDS ================= -->
+      <div id="cards-view" class="view-panel">
+        <div class="filter-bar">
+          <div class="filter-group">
+            <button class="filter-btn active" id="filter-all">All Clues (36)</button>
+            <button class="filter-btn" id="filter-across">Across (18)</button>
+            <button class="filter-btn" id="filter-down">Down (18)</button>
+          </div>
+
+          <input type="text" id="card-search" class="search-box" placeholder="🔍 Search clues or numbers..." autocomplete="off">
+        </div>
+
+        <div class="cards-grid" id="cards-container"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript Engine -->
+  <script>
+    // ==========================================================================
+    // COMPLETE IRISH TIMES SIMPLEX CROSSWORD NO. 19,196 DATASET
+    // ==========================================================================
+    const PUZZLE_DATA = [
+      // ACROSS
+      { num: 1, dir: 'across', clue: "It's used in jam-making (6)", ans: "PECTIN", len: 6 },
+      { num: 4, dir: 'across', clue: "Buyer or client (8)", ans: "CUSTOMER", len: 8 },
+      { num: 9, dir: 'across', clue: "The continent named after the consort of Zeus (6)", ans: "EUROPE", len: 6 },
+      { num: 10, dir: 'across', clue: "Gives someone a job or position (8)", ans: "APPOINTS", len: 8 },
+      { num: 12, dir: 'across', clue: "TS..., author of The Waste Land (5)", ans: "ELIOT", len: 5 },
+      { num: 13, dir: 'across', clue: "Polaris (5,4)", ans: "NORTH STAR", len: 9 },
+      { num: 15, dir: 'across', clue: "Fluid from cuttlefish (3)", ans: "INK", len: 3 },
+      { num: 16, dir: 'across', clue: "Look for, origin or ancestor, say (5)", ans: "TRACE", len: 5 },
+      { num: 17, dir: 'across', clue: "Water protozoan (6)", ans: "AMOEBA", len: 6 },
+      { num: 22, dir: 'across', clue: "In winter, they're known as ermines (6)", ans: "STOATS", len: 6 },
+      { num: 24, dir: 'across', clue: "Jewelled head ornament (5)", ans: "TIARA", len: 5 },
+      { num: 27, dir: 'across', clue: "Consume food (3)", ans: "EAT", len: 3 },
+      { num: 28, dir: 'across', clue: "Handheld collapsible canopies (9)", ans: "UMBRELLAS", len: 9 },
+      { num: 31, dir: 'across', clue: "A bald one is a US emblem (5)", ans: "EAGLE", len: 5 },
+      { num: 32, dir: 'across', clue: "M or K (8)", ans: "THOUSAND", len: 8 },
+      { num: 33, dir: 'across', clue: "Loud angry rant (6)", ans: "TIRADE", len: 6 },
+      { num: 34, dir: 'across', clue: "Average, mediocre (8)", ans: "MIDDLING", len: 8 },
+      { num: 35, dir: 'across', clue: "Trembling trees (6)", ans: "ASPENS", len: 6 },
+
+      // DOWN
+      { num: 1, dir: 'down', clue: "Stops from happening (8)", ans: "PREVENTS", len: 8 },
+      { num: 2, dir: 'down', clue: "Mardi Gras or Notting Hill (8)", ans: "CARNIVAL", len: 8 },
+      { num: 3, dir: 'down', clue: "Unwilling to wait (9)", ans: "IMPATIENT", len: 9 },
+      { num: 5, dir: 'down', clue: "Higher in place or position (5)", ans: "UPPER", len: 5 },
+      { num: 6, dir: 'down', clue: "Projection of gear wheel and gum (5)", ans: "TOOTH", len: 5 },
+      { num: 7, dir: 'down', clue: "60 seconds (6)", ans: "MINUTE", len: 6 },
+      { num: 8, dir: 'down', clue: "Area popular with holiday-makers (6)", ans: "RESORT", len: 6 },
+      { num: 11, dir: 'down', clue: "Turkish capital (6)", ans: "ANKARA", len: 6 },
+      { num: 14, dir: 'down', clue: "Golfing starts here (3)", ans: "TEE", len: 3 },
+      { num: 18, dir: 'down', clue: "Be overly preoccupied with something (6)", ans: "OBSESS", len: 6 },
+      { num: 19, dir: 'down', clue: "Containers with cells producing power (9)", ans: "BATTERIES", len: 9 },
+      { num: 20, dir: 'down', clue: "Means of communication (8)", ans: "LANGUAGE", len: 8 },
+      { num: 21, dir: 'down', clue: "Groundless, unfounded (8)", ans: "BASELESS", len: 8 },
+      { num: 23, dir: 'down', clue: "Viscous liquid (3)", ans: "TAR", len: 3 },
+      { num: 25, dir: 'down', clue: "Age cannot wither her, nor ... stale (6)", ans: "CUSTOM", len: 6 },
+      { num: 26, dir: 'down', clue: "Overseas (6)", ans: "ABROAD", len: 6 },
+      { num: 29, dir: 'down', clue: "Artist's tripod (5)", ans: "EASEL", len: 5 },
+      { num: 30, dir: 'down', clue: "Cloth woven from flax (5)", ans: "LINEN", len: 5 }
+    ];
+
+    // GLOBAL APP STATE
+    let currentQuizIndex = 0;
+    let userScore = 0;
+    let quizUserGuess = [];
+    let activeCardFilter = 'all';
+    let revealedCards = new Set();
+
+    // WEB AUDIO API SYNTHESIZER (NO EXTERNAL AUDIO FILES REQUIRED)
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'tap') {
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'correct') {
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.08);
+          osc.frequency.setValueAtTime(783.99, now + 0.16);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'reveal') {
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        }
+      } catch (e) {
+        // Fallback for audio restrictions
+      }
+    }
+
+    // DIRECT CLEVERTOUCH TOUCH/POINTER ATTACHMENT HELPER
+    function attachTouchHandler(element, callback) {
+      if (!element) return;
+      let handled = false;
+
+      const handleTouch = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handled = true;
+        initAudio();
+        callback(e);
+        setTimeout(() => { handled = false; }, 250);
+      };
+
+      element.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+          handleTouch(e);
+        }
+      }, { passive: false });
+
+      element.addEventListener('click', (e) => {
+        if (!handled) {
+          initAudio();
+          callback(e);
+        }
+      });
+    }
+
+    // INITIALIZATION
+    window.onload = function() {
+      setupNavigation();
+      renderKeyboard();
+      loadQuizClue(currentQuizIndex);
+      renderCards();
+    };
+
+    // NAVIGATION TABS
+    function setupNavigation() {
+      attachTouchHandler(document.getElementById('tab-quiz'), () => switchTab('quiz'));
+      attachTouchHandler(document.getElementById('tab-cards'), () => switchTab('cards'));
+
+      // Quiz Actions
+      attachTouchHandler(document.getElementById('btn-prev'), () => prevQuizClue());
+      attachTouchHandler(document.getElementById('btn-next'), () => nextQuizClue());
+      attachTouchHandler(document.getElementById('btn-random'), () => randomQuizClue());
+      attachTouchHandler(document.getElementById('btn-hint'), () => revealQuizHint());
+      attachTouchHandler(document.getElementById('btn-reveal'), () => revealQuizAnswer());
+      attachTouchHandler(document.getElementById('btn-clear'), () => clearQuizGuess());
+
+      // Card Filters
+      attachTouchHandler(document.getElementById('filter-all'), () => setCardFilter('all'));
+      attachTouchHandler(document.getElementById('filter-across'), () => setCardFilter('across'));
+      attachTouchHandler(document.getElementById('filter-down'), () => setCardFilter('down'));
+
+      document.getElementById('card-search').addEventListener('input', renderCards);
+    }
+
+    function switchTab(tab) {
+      playSound('tap');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+
+      if (tab === 'quiz') {
+        document.getElementById('tab-quiz').classList.add('active');
+        document.getElementById('quiz-view').classList.add('active');
+      } else {
+        document.getElementById('tab-cards').classList.add('active');
+        document.getElementById('cards-view').classList.add('active');
+      }
+    }
+
+    // ==========================================================================
+    // MODE 1: INTERACTIVE QUIZ ENGINE
+    // ==========================================================================
+    function loadQuizClue(index) {
+      const item = PUZZLE_DATA[index];
+      document.getElementById('quiz-badge').innerText = `${item.dir.toUpperCase()} #${item.num}`;
+      document.getElementById('quiz-progress').innerText = `Clue ${index + 1} of ${PUZZLE_DATA.length}`;
+      document.getElementById('quiz-clue').innerText = `"${item.clue}"`;
+      document.getElementById('quiz-length').innerText = `${item.len} Letters`;
+
+      // Reset guess state for new clue
+      quizUserGuess = [];
+      for (let i = 0; i < item.ans.length; i++) {
+        if (item.ans[i] === ' ') {
+          quizUserGuess.push(' ');
+        } else {
+          quizUserGuess.push('');
+        }
+      }
+
+      renderQuizSlots();
+    }
+
+    function renderQuizSlots() {
+      const container = document.getElementById('quiz-slots');
+      container.innerHTML = '';
+      const item = PUZZLE_DATA[currentQuizIndex];
+
+      for (let i = 0; i < item.ans.length; i++) {
+        const slot = document.createElement('div');
+        const char = quizUserGuess[i] || '';
+
+        if (item.ans[i] === ' ') {
+          slot.className = 'letter-slot space';
+        } else {
+          slot.className = `letter-slot ${char ? 'filled' : ''}`;
+          slot.innerText = char;
+        }
+
+        container.appendChild(slot);
+      }
+    }
+
+    function handleKeyInput(key) {
+      playSound('tap');
+      const item = PUZZLE_DATA[currentQuizIndex];
+
+      if (key === 'BACK') {
+        for (let i = quizUserGuess.length - 1; i >= 0; i--) {
+          if (item.ans[i] !== ' ' && quizUserGuess[i] !== '') {
+            quizUserGuess[i] = '';
+            break;
+          }
+        }
+      } else {
+        for (let i = 0; i < quizUserGuess.length; i++) {
+          if (item.ans[i] !== ' ' && quizUserGuess[i] === '') {
+            quizUserGuess[i] = key;
+            break;
+          }
+        }
+      }
+
+      renderQuizSlots();
+
+      // Check for completion
+      if (quizUserGuess.join('') === item.ans) {
+        playSound('correct');
+        userScore += 50;
+        document.getElementById('quiz-score').innerText = `${userScore} PTS`;
+        setTimeout(() => {
+          nextQuizClue();
+        }, 1000);
+      }
+    }
+
+    function prevQuizClue() {
+      playSound('tap');
+      currentQuizIndex = (currentQuizIndex - 1 + PUZZLE_DATA.length) % PUZZLE_DATA.length;
+      loadQuizClue(currentQuizIndex);
+    }
+
+    function nextQuizClue() {
+      playSound('tap');
+      currentQuizIndex = (currentQuizIndex + 1) % PUZZLE_DATA.length;
+      loadQuizClue(currentQuizIndex);
+    }
+
+    function randomQuizClue() {
+      playSound('tap');
+      currentQuizIndex = Math.floor(Math.random() * PUZZLE_DATA.length);
+      loadQuizClue(currentQuizIndex);
+    }
+
+    function revealQuizHint() {
+      playSound('tap');
+      const item = PUZZLE_DATA[currentQuizIndex];
+
+      for (let i = 0; i < item.ans.length; i++) {
+        if (quizUserGuess[i] !== item.ans[i]) {
+          quizUserGuess[i] = item.ans[i];
+          break;
+        }
+      }
+      userScore = Math.max(0, userScore - 10);
+      document.getElementById('quiz-score').innerText = `${userScore} PTS`;
+      renderQuizSlots();
+
+      if (quizUserGuess.join('') === item.ans) {
+        playSound('correct');
+      }
+    }
+
+    function revealQuizAnswer() {
+      playSound('reveal');
+      const item = PUZZLE_DATA[currentQuizIndex];
+      quizUserGuess = item.ans.split('');
+      renderQuizSlots();
+    }
+
+    function clearQuizGuess() {
+      playSound('tap');
+      const item = PUZZLE_DATA[currentQuizIndex];
+      quizUserGuess = [];
+      for (let i = 0; i < item.ans.length; i++) {
+        quizUserGuess.push(item.ans[i] === ' ' ? ' ' : '');
+      }
+      renderQuizSlots();
+    }
+
+    // CLEVERTOUCH OVERSIZED VIRTUAL KEYBOARD RENDERER
+    function renderKeyboard() {
+      const container = document.getElementById('quiz-keyboard');
+      container.innerHTML = '';
+
+      const layout = [
+        ['Q','W','E','R','T','Y','U','I','O','P'],
+        ['A','S','D','F','G','H','J','K','L'],
+        ['Z','X','C','V','B','N','M','BACK']
+      ];
+
+      layout.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'kb-row';
+
+        row.forEach(key => {
+          const btn = document.createElement('button');
+          const isBack = key === 'BACK';
+          btn.className = `key-btn ${isBack ? 'wide' : ''}`;
+          btn.innerText = isBack ? '⌫ ERASE' : key;
+
+          attachTouchHandler(btn, () => handleKeyInput(key));
+          rowEl.appendChild(btn);
+        });
+
+        container.appendChild(rowEl);
+      });
+    }
+
+    // ==========================================================================
+    // MODE 2: GIANT CLUE CARDS ENGINE
+    // ==========================================================================
+    function setCardFilter(filter) {
+      playSound('tap');
+      activeCardFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`filter-${filter}`).classList.add('active');
+      renderCards();
+    }
+
+    function toggleCardReveal(index) {
+      playSound('tap');
+      if (revealedCards.has(index)) {
+        revealedCards.delete(index);
+      } else {
+        revealedCards.add(index);
+      }
+      renderCards();
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cards-container');
+      const query = document.getElementById('card-search').value.toLowerCase().trim();
+      container.innerHTML = '';
+
+      PUZZLE_DATA.forEach((item, index) => {
+        if (activeCardFilter !== 'all' && item.dir !== activeCardFilter) return;
+        if (query && !item.clue.toLowerCase().includes(query) && !item.num.toString().includes(query)) return;
+
+        const isRevealed = revealedCards.has(index);
+        const card = document.createElement('div');
+        card.className = `clue-card ${item.dir}`;
+
+        attachTouchHandler(card, () => toggleCardReveal(index));
+
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <span class="card-num">${item.num}</span>
+              <span class="card-dir">${item.dir}</span>
+            </div>
+            <div class="card-clue-text">"${item.clue}"</div>
+          </div>
+          <div class="card-ans-box ${isRevealed ? '' : 'hidden'}">
+            ${isRevealed ? item.ans : '👆 TAP TO REVEAL ANSWER'}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
